@@ -21,6 +21,7 @@ exports.createUser = catchAsyncErrors(async (req, res, next) => {
 })
 
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+    console.log("Trying to login");
     const {email, password} = req.body;
 
     if(!password) {
@@ -40,4 +41,17 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     }
 
     sendToken(user, 200, res);
+})
+
+// logout user
+exports.logoutUser = catchAsyncErrors(async (req, res, next) => {
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true
+    })
+
+    res.status(200).json({
+        success: true,
+        message: "Logged Out"
+    })
 })

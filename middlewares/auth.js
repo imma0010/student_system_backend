@@ -4,48 +4,43 @@ const catchAsyncErrors = require("./catchAsyncErrors");
 const jwt = require("jsonwebtoken");
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-    const authorizationHeader = req.headers.authorization;
+    // console.log(req.cookies);
+    const token = req.headers.authorization;
 
-    if (!authorizationHeader) {
-        next();
+    if (!token) {
+        return next();
+        // return next(new ErrorHandler("Please Login to access this resource.", 401));
     } else {
-        const authToken = req.headers.authorization;
-        // console.log("Request Headers: ", req.headers.authorization);
-
-        if (!authToken) {
-            next();
-            // return next(new ErrorHandler("Please Login to access this resource", 401))
-        }
-
-        const token = authToken.split(" ")[1];
-
         try {
             const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-
-            const user = await User.findById(decodedData.id);
-            // console.log("Token expires in", decodedData.exp);
+            const user = await User.findById(decodedData.id)
 
             if (!user) {
-                next();
-                // return next(new ErrorHandler("Please Login to access this resource", 401))
+                return next(new ErrorHandler("Please Login to access this resource.", 401))
             }
 
             req.user = user;
-            next();
         } catch (error) {
-            if (error.name == "TokenExpiredError") {
+            // Check if the error is a TokenExpiredError
+            if (error.name === 'TokenExpiredError') {
+                // Handle the expired token error and return a 401 Unauthorized response
                 return res.status(401).json({
                     success: false,
-                    message: "Token Expired. Log In Again"
-                })
+                    message: 'Token Expired. Log in again',
+                });
             } else {
+                // Handle other JWT verification errors
+                // You can log or handle them differently based on your requirements
+                console.error('JWT Verification Error:', error);
                 return res.status(500).json({
                     success: false,
-                    message: "Internal Server Error"
-                })
+                    message: 'Internal Server Error',
+                });
             }
         }
     }
+
+    next();
 })
 
 exports.authorizedRole = (...roles) => {

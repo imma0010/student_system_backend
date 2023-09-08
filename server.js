@@ -1,7 +1,7 @@
 const app = require("./app");
-const databaseConnect = require("./config/database");
+const databaseConnect = require("./connection/database")
 
-const port = process.env.port || 4000;
+const port = process.env.PORT || 4000;
 
 databaseConnect();
 
