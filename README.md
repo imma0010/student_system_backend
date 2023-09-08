@@ -10,7 +10,7 @@ Make sure **.env** file is created in order to run backend
 
 The variables required in **.env** are:
 ```console
-DB_URI = **url for mongo db**
+DB_URI = //url for mongo db
 JWT_SECRET = helloworld
 JWT_EXPIRE = 60m
 PORT = 4000
